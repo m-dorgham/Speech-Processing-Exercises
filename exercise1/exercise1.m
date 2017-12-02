@@ -45,7 +45,6 @@ for i=1:length(acf_1(:,1))
 	true_max_idx = start_idx+max_index-1-zero_idx;
 	f_period_len = double(true_max_idx)/double(fs_1);
 	f_freqs_1(i) = 1/f_period_len;
-	X = ["Fundemental frequency is ", num2str(f_freqs_1(i)), " Hz. At lag of ", num2str(f_periods_1(i)*1000), " ms."];
 endfor
 
 zero_idx = length(m_frames_2(1,:))+1;
@@ -56,7 +55,6 @@ for i=1:length(acf_2(:,1))
 	true_max_idx = start_idx+max_index-1-zero_idx;
 	f_period_len = double(true_max_idx)/double(fs_2);
 	f_freqs_2(i) = 1/f_period_len;
-	X = ["Fundemental frequency is ", num2str(f_freqs_2(i)), " Hz. At lag of ", num2str(f_periods_2(i)*1000), " ms."];
 endfor
 
 
