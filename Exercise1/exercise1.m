@@ -17,7 +17,6 @@ function [m_frames, v_time_frame] = my_windowing(v_signal, sampling_rate, frame_
 		endif
 		i++;
 	endfor
-
 endfunction
 
 
