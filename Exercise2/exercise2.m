@@ -1,5 +1,5 @@
-[M_1,fs_1] = audioread ("/home/dorgham/Documents/AudioFiles2/speech1.wav");
-[M_2,fs_2] = audioread ("/home/dorgham/Documents/AudioFiles2/phone.wav");
+[M_1,fs_1] = audioread ("Audio/speech1.wav");
+[M_2,fs_2] = audioread ("Audio/phone.wav");
 
 
 function [m_stft, v_freq, v_time] = my_stft(v_signal, sampling_rate, frame_length, frame_shift, v_analysis_window)
