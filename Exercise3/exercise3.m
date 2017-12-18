@@ -1,4 +1,4 @@
-[sig,fs] = audioread ("/home/dorgham/Documents/AudioFiles3/speech1.wav");
+[sig,fs] = audioread ("Audio/speech1.wav");
 
 %plot(sig)
 
