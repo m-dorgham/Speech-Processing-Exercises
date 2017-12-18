@@ -1,5 +1,5 @@
-[M_1,fs_1] = audioread ("/home/dorgham/Documents/AudioFiles/speech1.wav");
-[M_2,fs_2] = audioread ("/home/dorgham/Documents/AudioFiles/speech2.wav");
+[M_1,fs_1] = audioread ("AudioFiles/speech1.wav");
+[M_2,fs_2] = audioread ("AudioFiles/speech2.wav");
 
 
 function [m_frames, v_time_frame] = my_windowing(v_signal, sampling_rate, frame_length, frame_shift)
