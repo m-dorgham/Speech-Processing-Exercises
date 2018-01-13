@@ -202,3 +202,19 @@ hold on
 plot(v_time_f/nSamplesPerSecond, vPitch_f, 'r', 'LineWidth',2)
 hold off
 
+%Quantization test with ramp function
+rs=-5:0.01:5;
+xMax=3;
+xCenter=0;
+nBits=2;
+
+enc_rs = quantizeEncoder(rs, nBits, xMax, xCenter);
+q_rs = quantizeDecoder(enc_rs, nBits, xMax, xCenter);
+
+figure
+plot(rs)
+hold on
+plot(q_rs)
+hold off
+
+
