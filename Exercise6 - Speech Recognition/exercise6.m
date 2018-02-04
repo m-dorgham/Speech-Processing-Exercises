@@ -16,6 +16,7 @@ set(gca, 'YTick', 1:23);
 % numbering for the Mel bands .
 set(gca, 'YTickLabel', round(vMelFrequenciesA(get(gca, 'YTick'))));
 colorbar
+title('Log Mel Spectrogram for the word stop (normal) of speaker df')
 drawnow
 
 %section 3: DTW
@@ -29,6 +30,7 @@ imagesc(mDistance)
 colormap('gray')
 axis xy;
 colorbar
+title('Distance matrix between stop (normal and slow) of speaker df')
 drawnow
 
 %construct the warped Log-Mel-Spectrogram of the two signals
