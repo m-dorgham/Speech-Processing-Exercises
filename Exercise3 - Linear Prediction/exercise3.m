@@ -1,3 +1,6 @@
+close all
+pkg load signal
+
 [sig,fs] = audioread ("Audio/speech1.wav");
 
 %plot(sig)
@@ -46,14 +49,16 @@ H_v = H_v.*sigma_sv/sigma_hv;
 H_u = H_u.*sigma_su/sigma_hu;
 
 figure
-%we subtract from sqrt of the power of the signal just as a normalization factor to align the H_v plot on S_v plot
 plot(freq_ax1, 20*log10(abs(H_v)))
 hold on
 plot(freq_ax1, 20*log10(abs(S_v)))
 hold off
 xlabel('Frequency (Hz)')
 ylabel('Magnitude (dB)')
+title('frequency response of the estimated vocal tract filter (voiced segment)')
+legend('Estimated response', 'Original response', 'Location','southeast')
 axis tight
+drawnow
 
 figure
 plot(freq_ax2, 20*log10(abs(H_u)))
@@ -62,7 +67,10 @@ plot(freq_ax2, 20*log10(abs(S_u)))
 hold off
 xlabel('Frequency (Hz)')
 ylabel('Magnitude (dB)')
+title('frequency response of the estimated vocal tract filter (unvoiced segment)')
+legend('Estimated response', 'Original response', 'Location','southeast')
 axis tight
+drawnow
 
 e_v = filter([1; a_v],1,voiced_frame);
 e_u = filter([1; a_u],1,unvoiced_frame);
@@ -70,8 +78,11 @@ e_u = filter([1; a_u],1,unvoiced_frame);
 figure
 plot(1:length(voiced_frame), voiced_frame, 1:length(e_v), e_v, '--')
 legend('Original signal','Residual Signal')
+title('The residual signal (voiced segment)')
+drawnow
 
 figure
 plot(1:length(unvoiced_frame), unvoiced_frame, 1:length(e_u), e_u, '--')
 legend('Original signal','Residual Signal')
+title('The residual signal (unvoiced segment)')
 
