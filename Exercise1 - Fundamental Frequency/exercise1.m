@@ -1,36 +1,20 @@
+close all
+
 [M_1,fs_1] = audioread ("AudioFiles/speech1.wav");
 [M_2,fs_2] = audioread ("AudioFiles/speech2.wav");
-
-
-function [m_frames, v_time_frame] = my_windowing(v_signal, sampling_rate, frame_length, frame_shift)
-	m_frames_width = frame_length*sampling_rate;
-	m_frames_height= length(v_signal)/(frame_shift*sampling_rate);
-	i = 1;
-	for j = 1:frame_shift*sampling_rate:length(v_signal)
-		v_time_frame(i)=j+m_frames_width-(m_frames_width/2)-1;
-		if(j+m_frames_width-1 < length(v_signal))
-			m_frames(i, 1:m_frames_width) = v_signal(j:j+m_frames_width-1);
-		else
-			remaining_elems = length(v_signal)-j;
-			m_frames(i, 1:remaining_elems) = v_signal(j:j+remaining_elems-1);
-			m_frames(i, remaining_elems+1:m_frames_width) = zeros(1, m_frames_width-remaining_elems);
-		endif
-		i++;
-	endfor
-endfunction
 
 
 [m_frames_1, v_time_frame_1] = my_windowing(M_1, fs_1, 0.032, 0.016);
 [m_frames_2, v_time_frame_2] = my_windowing(M_2, fs_2, 0.032, 0.016);
 
 
-for i=1:length(m_frames_1(:,1))
+for i=1:rows(m_frames_1)
 	flipped_frame =  fliplr(m_frames_1(i,:));
 	acf_1(i,1:length(m_frames_1(i,:))*2-1) = conv(m_frames_1(i,:), flipped_frame);
 endfor
 
 
-for i=1:length(m_frames_2(:,1))
+for i=1:rows(m_frames_2)
 	flipped_frame =  fliplr(m_frames_2(i,:));
 	acf_2(i,1:length(m_frames_2(i,:))*2-1) = conv(m_frames_2(i,:), flipped_frame);
 endfor
@@ -67,19 +51,25 @@ x2= v_time_frame_2/fs_2;
 figure
 subplot(2,1,1)       % add first plot in 2 x 1 grid
 plot(t1,M_1)
+xlabel('time (s)')
 title('Speech Signal 1')
 
 subplot(2,1,2)       % add second plot in 2 x 1 grid
-plot(x1,f_freqs_1)       
+plot(x1,f_freqs_1)
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
 title('Estimated fundamental frequency')
-
+drawnow
 
 figure
 subplot(2,1,1)       % add first plot in 2 x 1 grid
 plot(t2,M_2)
+xlabel('time (s)')
 title('Speech Signal 2')
 
 subplot(2,1,2)       % add second plot in 2 x 1 grid
-plot(x2,f_freqs_2)       
+plot(x2,f_freqs_2)
+xlabel('time (s)')
+ylabel('Frequency (Hz)')     
 title('Estimated fundamental frequency')
 
