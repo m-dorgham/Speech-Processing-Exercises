@@ -1,3 +1,6 @@
+close all
+pkg load signal
+
 [x,fs] = audioread ("female8khz.wav");
 t= linspace(0, length(x)/fs, length(x));
 
@@ -16,7 +19,8 @@ hold on
 plot(v_time_frame/fs, x_energy, 'LineWidth',2)
 hold off
 axis tight
-
+title('The energy of the speech signal')
+drawnow
 
 for i=1:rows(m_frames)
 	seg_voiced(i) = isVoiced(m_frames(i,:));
@@ -28,7 +32,8 @@ hold on
 plot(v_time_frame/fs, seg_voiced.*0.1, 'LineWidth',2)
 hold off
 axis tight
-
+title('Voiced and Unvoiced areas in the signal')
+drawnow
 
 vPitch = estimatePitch(m_frames, fs);
 [m_stft, v_freq, v_time] = my_stft(x, fs, frame_length, frame_shift, hann(frame_length*fs, 'periodic'));
@@ -36,10 +41,14 @@ vPitch = estimatePitch(m_frames, fs);
 figure
 imagesc(v_time/fs, v_freq, 10*log10(max(abs(m_stft).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
+colorbar
 hold on
 plot(v_time/fs, vPitch, 'r', 'LineWidth',2)
 hold off
-
+title('Spectrogram of the signal with the estimated fundamental frequency')
+drawnow
 
 
 matLPC = getLPC(m_frames, 12);
@@ -95,9 +104,18 @@ set(gcf, 'Position', [100, 200, 1100, 400])
 subplot(1,2,1);
 imagesc(v_time_v/nSamplesPerSecond, v_freq_v, 10*log10(max(abs(m_stft_v).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
+colorbar
+title('Spectrogram of generated voiced signal')
 subplot(1,2,2);
 imagesc(v_time_u/nSamplesPerSecond, v_freq_u, 10*log10(max(abs(m_stft_u).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
+colorbar
+title('Spectrogram of generated unvoiced signal')
+drawnow
 
 %%3.2
 filterState = [];
@@ -119,6 +137,10 @@ playObj = audioplayer(signal_out, nSamplesPerSecond);
 figure
 imagesc(v_time_c/nSamplesPerSecond, v_freq_c, 10*log10(max(abs(m_stft_c).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
+title('Incorporating voiced/unvoiced information')
+drawnow
 
 %%3.3 Adjusting the amplitude
 for i=1:rows(m_frames_v)
@@ -150,6 +172,10 @@ playObj = audioplayer(signal_out, nSamplesPerSecond);
 figure
 imagesc(v_time_g/nSamplesPerSecond, v_freq_g, 10*log10(max(abs(m_stft_g).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
+title('Adjusting the generated signal power')
+drawnow
 
 %3.4 involve fundamental frequency
 f_freq_samples = nSamplesPerSecond ./ vPitch;
@@ -198,9 +224,13 @@ vPitch_f = estimatePitch(m_frames_o, nSamplesPerSecond);
 figure
 imagesc(v_time_f/nSamplesPerSecond, v_freq_f, 10*log10(max(abs(m_stft_f).^2, 10^(-15))))
 axis xy
+xlabel('time (s)')
+ylabel('Frequency (Hz)')
 hold on
 plot(v_time_f/nSamplesPerSecond, vPitch_f, 'r', 'LineWidth',2)
 hold off
+title('Incorporating fundamental frequency of original signal')
+drawnow
 
 %Quantization test with ramp function
 rs=-5:0.01:5;
@@ -212,9 +242,12 @@ enc_rs = quantizeEncoder(rs, nBits, xMax, xCenter);
 q_rs = quantizeDecoder(enc_rs, nBits, xMax, xCenter);
 
 figure
-plot(rs)
+plot(rs,'DisplayName','ramp function')
 hold on
-plot(q_rs)
+plot(q_rs,'DisplayName','quantized ramp')
 hold off
-
+axis tight
+title('Reconstructing quantized ramp function')
+legend('show')
+drawnow
 
