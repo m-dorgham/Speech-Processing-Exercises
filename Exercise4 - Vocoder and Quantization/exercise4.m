@@ -214,7 +214,7 @@ for i=1:rows(m_frames_f)
 endfor
 
 playObj = audioplayer(signal_out_f, nSamplesPerSecond);
-%playblocking(playObj);
+playblocking(playObj);
 
 [m_frames_o, v_time_frame_o] = my_windowing(signal_out_f, nSamplesPerSecond, frame_length, frame_shift);
 vPitch_f = estimatePitch(m_frames_o, nSamplesPerSecond);
@@ -251,3 +251,111 @@ title('Reconstructing quantized ramp function')
 legend('show')
 drawnow
 
+%Quantizing fundamental frequency
+xCenter = round(mean(vPitch));
+xMax = round(max(vPitch) - mean(vPitch));
+nBits = 6;
+
+enc_vPitch = quantizeEncoder(vPitch, nBits, xMax, xCenter);
+q_vPitch = quantizeDecoder(enc_vPitch, nBits, xMax, xCenter);
+
+%resynthesize the signal
+f_freq_samples = nSamplesPerSecond ./ q_vPitch;
+frame_len_samples = columns(m_frames_v);
+
+e_voiced = zeros(nSamples, 1);
+counter = 0;
+for i=1:length(e_voiced)
+	counter = counter+1;
+	if counter>=f_freq_samples(ceil(i/frame_len_samples))
+		counter=0;
+		e_voiced(i)=1;
+	end
+end
+
+[m_frames_f, v_time_frame_f] = my_windowing(e_voiced, nSamplesPerSecond, frame_shift, frame_shift);
+
+% Adjust the amplitude
+for i=1:rows(m_frames_f)
+	frame_energy_f = max(sqrt(computePower(m_frames_f(i,:))),10^(-15));
+	gain_f = x_energy(i)/frame_energy_f;
+	m_frames_f(i,:) = m_frames_f(i,:).*gain_f;
+endfor
+
+%apply adaptive filtering
+filterState = [];
+signal_out_f = [];
+for i=1:rows(m_frames_f)
+	if seg_voiced(i)==1
+		sel_frame = m_frames_f(i,:);
+	else 
+		sel_frame = m_frames_u(i,:);
+	end
+	[segmentOut, filterState] = filterAdaptively(1, [1;matLPC(:,i)], sel_frame, filterState);
+	signal_out_f = [signal_out_f; segmentOut];
+endfor
+
+playObj = audioplayer(signal_out_f, nSamplesPerSecond);
+playblocking(playObj);
+
+pitch_combined=[vPitch; q_vPitch]';
+figure
+hist(pitch_combined,500)
+title('Histogram of quantized and unquantized fundamental frequency')
+
+%Quantizing the signal energy
+figure
+hist(x_energy)
+title('Histogram of signal energy per frames')
+
+xCenter = (max(x_energy)-min(x_energy))/2;
+xMax = max(x_energy) - xCenter;
+nBits = 3;
+
+enc_energy = quantizeEncoder(x_energy, nBits, xMax, xCenter);
+q_energy = quantizeDecoder(enc_energy, nBits, xMax, xCenter);
+
+%resynthesize the signal
+f_freq_samples = nSamplesPerSecond ./ q_vPitch;
+frame_len_samples = columns(m_frames_v);
+
+e_voiced = zeros(nSamples, 1);
+counter = 0;
+for i=1:length(e_voiced)
+	counter = counter+1;
+	if counter>=f_freq_samples(ceil(i/frame_len_samples))
+		counter=0;
+		e_voiced(i)=1;
+	end
+end
+
+[m_frames_f, v_time_frame_f] = my_windowing(e_voiced, nSamplesPerSecond, frame_shift, frame_shift);
+
+% Adjust the amplitude
+for i=1:rows(m_frames_f)
+	frame_energy_f = max(sqrt(computePower(m_frames_f(i,:))),10^(-15));
+	gain_f = q_energy(i)/frame_energy_f;
+	m_frames_f(i,:) = m_frames_f(i,:).*gain_f;
+endfor
+
+%apply adaptive filtering
+filterState = [];
+signal_out_f = [];
+for i=1:rows(m_frames_f)
+	if seg_voiced(i)==1
+		sel_frame = m_frames_f(i,:);
+	else 
+		sel_frame = m_frames_u(i,:);
+	end
+	[segmentOut, filterState] = filterAdaptively(1, [1;matLPC(:,i)], sel_frame, filterState);
+	signal_out_f = [signal_out_f; segmentOut];
+endfor
+
+playObj = audioplayer(signal_out_f, nSamplesPerSecond);
+playblocking(playObj);
+
+
+log_x_energy = log10(x_energy);
+figure
+hist(log_x_energy)
+title('Histogram of signal log energy per frames')
