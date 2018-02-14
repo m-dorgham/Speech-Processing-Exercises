@@ -202,3 +202,7 @@ title('Enhanced speech signal spectrogram')
 synthesizedEnhancedSignal_w = my_inverse_stft(matEnhancedSpeech_w(:,2:end), fs_w, frame_length, frame_shift, sqrt(hann(frame_length*fs_w, 'periodic')));
 synthesizedEnhancedSignal_b = my_inverse_stft(matEnhancedSpeech_b(:,2:end), fs_b, frame_length, frame_shift, sqrt(hann(frame_length*fs_b, 'periodic')));
 
+soundsc(S_w, fs_w)
+soundsc(synthesizedEnhancedSignal_w, fs_w)
+soundsc(S_b, fs_b)
+soundsc(synthesizedEnhancedSignal_b, fs_b)
